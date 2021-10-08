@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const morgan = require('morgan');
 const winston = require('winston');
+const userAgentParser = require('ua-parser-js');
 
 const logger = winston.createLogger({
     transports: [
@@ -26,15 +27,40 @@ function startServer() {
         timestamp: ':date[iso]',
         user_agent: ':user-agent',
     });
-    
+
     app.use(morgan(morganJSONFormat(), {
         'stream': {
             write: (message) => {
                 const data = JSON.parse(message);
+                parseUserAgent(data);
+                sanitizeUrl(data);
                 return logger.info("accesslog", data);
             }
         }
     }));
+
+    function parseUserAgent(data) {
+        if (data.user_agent) {
+            const ua = userAgentParser(data.user_agent);
+            if (ua.browser) {
+                data.user_agent_browser_name = ua.browser.name;
+                data.user_agent_browser_version = ua.browser.major || ua.browser.version;
+            }
+            if (ua.os) {
+                data.user_agent_os_name = ua.os.name;
+                data.user_agent_os_version = ua.os.version;
+            }
+        }
+    }
+
+    function sanitizeUrl(data) {
+        if (!data.url) {
+            return;
+        }
+        const regex = /\/[0-9]+/g;
+        const urlWithoutParameter = data.url.replace(regex, '/:id');
+        data.url_sanitized = urlWithoutParameter;
+    }
 
 	app.get('/', (req, res) => {
         logger.info("Hi there !");
