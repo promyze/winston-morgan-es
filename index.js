@@ -26,7 +26,15 @@ function startServer() {
         timestamp: ':date[iso]',
         user_agent: ':user-agent',
     });
-    app.use(morgan(morganJSONFormat()));
+    
+    app.use(morgan(morganJSONFormat(), {
+        'stream': {
+            write: (message) => {
+                const data = JSON.parse(message);
+                return logger.info("accesslog", data);
+            }
+        }
+    }));
 
 	app.get('/', (req, res) => {
         logger.info("Hi there !");
