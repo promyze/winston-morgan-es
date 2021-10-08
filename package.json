@@ -1,0 +1,22 @@
+{
+    "name": "promyze-extract-rules",
+    "author": "Cedric Teyton <cedric.teyton@promyze.com>",
+    "version": "1.0.0",
+    "private": false,
+    "description": "Extract opquast rules",
+    "repository": "",
+    "directories": {
+        "test": "test"
+    },
+    "engines": {
+        "node": ">=14.16.1"
+    },
+    "scripts": {
+        "start": "node index.js"
+    },
+    "dependencies": {
+        "express": "^4.17.1",
+        "morgan": "^1.10.0",
+        "winston": "^3.3.3"
+    }
+}
