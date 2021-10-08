@@ -14,7 +14,19 @@ const logger = winston.createLogger({
 
 function startServer() {
     const app = express();
-    app.use(morgan('combined'));
+    
+    const morganJSONFormat = () => JSON.stringify({
+        method: ':method',
+        url: ':url',
+        http_version: ':http-version',
+        remote_addr: ':remote-addr',
+        response_time: ':response-time',
+        status: ':status',
+        content_length: ':res[content-length]',
+        timestamp: ':date[iso]',
+        user_agent: ':user-agent',
+    });
+    app.use(morgan(morganJSONFormat()));
 
 	app.get('/', (req, res) => {
         logger.info("Hi there !");
